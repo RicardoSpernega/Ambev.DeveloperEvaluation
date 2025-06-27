@@ -53,6 +53,14 @@ public class Program
             builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
             var app = builder.Build();
+
+            // **Aqui: roda as migrations automaticamente**
+            using (var scope = app.Services.CreateScope())
+            {
+                var db = scope.ServiceProvider.GetRequiredService<DefaultContext>();
+                db.Database.Migrate();
+            }
+
             app.UseMiddleware<ValidationExceptionMiddleware>();
 
             if (app.Environment.IsDevelopment())
